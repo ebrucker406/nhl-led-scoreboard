@@ -219,7 +219,7 @@ class Data:
     def _is_new_day(self):
         debug.info('Checking for new day')
         self.refresh_current_date()
-        if self.today != self.date():
+        if self.today != self.date() and not self.network_issues:
             debug.info('It is a new day, refreshing Data')
 
             # Set the pointer to the first game in the list of Pref Games
@@ -283,6 +283,9 @@ class Data:
                 Add the option to start the earliest game in the preferred game list but change to the top one as soon as it start.
         """
         attempts_remaining = 5
+            attempts_remaining = 5
+        else:
+            return
         while attempts_remaining > 0:
             try:
                 data = nhl_api.data.get_score_details("{}-{}-{}".format(str(self.year), str(self.month).zfill(2), str(self.day).zfill(2)))
@@ -383,7 +386,11 @@ class Data:
     
     # This is the function that will determine the state of the board (Offday, Gameday, Live etc...).
     def get_status(self):
-        attempts_remaining = 5
+        if not self.network_issues:
+            attempts_remaining = 5
+        else:
+            self.status = Status()
+            return
         while attempts_remaining > 0:
             try:
                 debug.info("getting status")
@@ -405,7 +412,10 @@ class Data:
         """
             Get all the data of the main event.
         """
-        attempts_remaining = 5
+        if not self.network_issues:
+            attempts_remaining = 5
+        else:
+            return
         while attempts_remaining > 0:
             try:
                 self.overview = nhl_api.overview(self.current_game_id)
@@ -459,7 +469,10 @@ class Data:
     # Standings
 
     def refresh_standings(self):
-        attempts_remaining = 5
+        if not self.network_issues:
+            attempts_remaining = 5
+        else:
+            return
         while attempts_remaining > 0:
             try:
                 self.standings = nhl_api.standings()
@@ -515,7 +528,10 @@ class Data:
         self.current_round = None
         self.current_round_name = None
         self.stanleycup_round = None
-        attempts_remaining = 5
+        if not self.network_issues:
+            attempts_remaining = 5
+        else:
+            return
         while attempts_remaining > 0:
             try:
                 # Get the plaoffs data from the nhl api
@@ -536,7 +552,6 @@ class Data:
 
                         # Grab the series of the current round of playoff.
                         self.series_list = self.current_round.series
-
                         # Check if prefered team are part of the current round of playoff
                         self.pref_series = prioritize_pref_series(filter_list_of_series(self.series_list, self.pref_teams), self.pref_teams)
 
@@ -586,7 +601,10 @@ class Data:
 
     def refresh_data(self):
 
-        debug.log("refresing data")
+        if not self.network_issues:
+            debug.log("refresing data")
+        else:
+            return
         # Flag to determine when to refresh data
         self.needs_refresh = True
 
@@ -600,7 +618,10 @@ class Data:
         self.refresh_games()
 
     def refresh_daily(self):
-        debug.info('refreshing daily data')
+        if not self.network_issues:
+            debug.info('refreshing daily data')
+        else:
+            return
         self.teams_info = self.get_teams()
         self.teams_info_by_abbrev = self.get_teams_by_code()
         
