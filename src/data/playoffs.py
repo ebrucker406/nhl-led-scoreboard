@@ -62,8 +62,12 @@ class Series:
         overview = ""
         try:
             overview = nhl_api.overview(gameid)
-        except:
-            debug.error("failed overview refresh for series game id {}".format(gameid))
+        except Exception as e:
+            debug.error("failed overview refresh for series game id {}. Error: {}".format(gameid, str(e)))
+            overview = None
+        if overview is None:
+            debug.error("No overview data for series game id {}".format(gameid))
+            return None
         self.game_overviews[gameid] = overview
         return overview
         
