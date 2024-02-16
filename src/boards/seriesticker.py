@@ -176,9 +176,10 @@ class Seriesticker:
                     debug.error("Failed to get the overview for game id {}. Data unavailable or is TBD".format(game["gameId"]))
                     debug.error(error_message)
                     break
-            # If one of the request for player info failed after 5 attempts, return an empty dictionary
+            # If one of the request for player info failed after 5 attempts, log the error and continue with the next game
             if attempts_remaining == 0:
-                return False
+                debug.error("All attempts failed for game id {}. Continuing with the next game.".format(game["gameId"]))
+                continue
 
 
     def show_indicator(self, index, slides):
